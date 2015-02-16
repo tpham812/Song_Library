@@ -1,29 +1,45 @@
-//Truong Pham
+/**
+ * @author Truong Pham
+ * 
+ * This class is a tree data structure that holds the root of the song tree and maintains the tree
+ * using various operations.
+ */
 package MusicLibrary;
 
 import java.util.ArrayList;
 
+public class SongTree {
 
-public class Song_Action {
-
-	Song_Tree root;
-	int count;
+	/** Holds the beginning node in the song tree */
+	Song root;
 	
-	public Song_Action() {
+	/** Holds the order of songs that were store in library */
+	int order;
+	
+	public SongTree() {
 		
 		root = null;
-		count = 0;
+		order = 0;
 	}
+	
+	/**
+	 * This method adds a song node to the tree .
+	 * @param songName 		Song name
+	 * @param artistName 	Artist name
+	 * @param album			Album name
+	 * @param year			Year
+	 * @return				True if add is successful, false if song name and artist name already exits in tree.
+	 */
 	public boolean addToTree(String songName, String artistName, String album, String year) {
 		
-		Song_Tree curr = root, parent = null, temp = null;
-		if(root == null) {temp = new Song_Tree(parent, songName, artistName, album, year); root = temp; return true;}
+		Song curr = root, parent = null, temp = null;
+		if(root == null) {temp = new Song(parent, songName, artistName, album, year); root = temp; return true;}
 		while(curr != null) {
 			if(curr.title.toLowerCase().compareTo(songName.toLowerCase()) == 0 && curr.artist.toLowerCase().compareTo(artistName.toLowerCase()) == 0)
 				return false;
 			else if(curr.title.toLowerCase().compareTo(songName.toLowerCase()) > 0) {
 				if(curr.leftChild == null) {
-					temp = new Song_Tree(curr, songName, artistName, album, year); 
+					temp = new Song(curr, songName, artistName, album, year); 
 					curr.leftChild = temp;
 					return true;	
 				}
@@ -31,7 +47,7 @@ public class Song_Action {
 			}
 			else {
 				if(curr.rightChild == null) {
-					temp = new Song_Tree(curr, songName, artistName, album, year);
+					temp = new Song(curr, songName, artistName, album, year);
 					curr.rightChild = temp; 
 					return true;
 				}
@@ -41,9 +57,14 @@ public class Song_Action {
 		return true;
 	}
 	
+	/**
+	 * This method deletes a song node from the tree given the song name and artist name.
+	 * @param songName		Song name
+	 * @param artistName	Artist name
+	 */
 	public void deleteFromTree(String songName, String artistName) {
 		
-		Song_Tree curr = root, parent = null, temp = null;
+		Song curr = root, parent = null, temp = null;
 		
 		if (root == null) {return;}
 		
@@ -55,8 +76,8 @@ public class Song_Action {
 				parent = root;
 				curr = root.leftChild;
 				while(curr.rightChild!= null) {parent= curr; curr = curr.rightChild;}
-				if(parent == root) {root.artist = curr.artist; root.title = root.title; root.leftChild = curr.leftChild; return;}
-				else {parent.rightChild = curr.leftChild; root.artist = curr.artist; root.title = curr.title; return;}
+				if(parent == root) {root.artist = curr.artist; root.title = curr.title; root.album = curr.album; root.year = curr.year; root.leftChild = curr.leftChild; return;}
+				else {parent.rightChild = curr.leftChild; root.artist = curr.artist; root.title = curr.title; root.album = curr.album; root.year = curr.year; return;}
 			}
 		}
 		
@@ -87,33 +108,47 @@ public class Song_Action {
 		}
 	}
 	
+	/**
+	 * This method checks to see if the tree is empty.
+	 * @return True if tree is empty, otherwise false.
+	 */
 	public boolean checkIsEmpty() {
 		
-		if(root == null) return false;
-		else return true;
+		if(root == null) 
+			return false;
+		else 
+			return true;
 	}
 	
-	public String[] findSong(String songName, int order, String[] songDetail) {
+	/**
+	 * Find song given the song name.
+	 * @param songName 		Song name to search for 
+	 * @param order			Song order 
+	 * @return				String array containing song information if song is found, otherwise null
+	 */
+	public String[] findSong(String songName, int order) {
 		
-		Song_Tree curr = root;
+		Song curr = root;
+		String songDetail[] = new String[4];
 		while(curr != null) {
 			if(curr.title.toLowerCase().compareTo(songName.toLowerCase()) == 0 && curr.order == order) {
 				songDetail[0] = curr.title;
 				songDetail[1] = curr.artist;
 				songDetail[2] = curr.album;
 				songDetail[3] = curr.year;
-				break;
+				return songDetail;
 			}
 			else if(curr.title.toLowerCase().compareTo(songName.toLowerCase()) > 0) 
 				curr = curr.leftChild;
 			else
 				curr = curr.rightChild;
 		}	
-		return songDetail;
+		return null;
 	}
+	
 	public int findSongOrder(String songName, String artistName) {
 		
-		Song_Tree curr = root;
+		Song curr = root;
 		while(curr != null) {
 			if(curr.title.toLowerCase().compareTo(songName.toLowerCase()) == 0 && curr.artist.toLowerCase().compareTo(artistName.toLowerCase()) == 0) {
 				return curr.order;
@@ -125,17 +160,28 @@ public class Song_Action {
 		}
 		return 0;
 	}
-	public void getSongs(Song_Tree root, ArrayList<String> newSongs) {
+	
+	/**
+	 * This method gets all song names and store in the given ArrayList.
+	 * @param root 		Root of the song tree.
+	 * @param newSongs	ArrayList to store song names in.
+	 */
+	public void getSongs(Song root, ArrayList<String> newSongs) {
 		
 		if(root != null) {
 			getSongs(root.leftChild, newSongs);
 			newSongs.add(root.title);
-			root.order = count;
-			count++;
+			root.order = order;
+			order++;
 			getSongs(root.rightChild, newSongs);
 		}
 	}
-	public void printSongs(Song_Tree root) {
+	
+	/**
+	 * This method recursively prints each song and its information in the tree.
+	 * @param root		Root of song tree.
+	 */
+	public void printSongs(Song root) {
 		
 		if(root != null) {
 			printSongs(root.leftChild);

@@ -1,4 +1,8 @@
-//Truong Pham
+/**
+ * @author Truong Pham
+ * 
+ * This class is the event listener for the frame.
+ */
 package MusicLibrary;
 
 import java.awt.event.WindowEvent;
@@ -10,14 +14,22 @@ import java.io.PrintWriter;
 public class FrameListener implements WindowListener {
 
 	PrintWriter print;
-	Song_Interface inter;
+	SongLibrary_GUI gui;
 	
-	public FrameListener(Song_Interface inter) {
+	/**
+	 * Constructor of the class
+	 * @param gui 
+	 */
+	public FrameListener(SongLibrary_GUI gui) {
 		
-		this.inter = inter;
+		this.gui = gui;
 	}
 
-	public void appendToFile(Song_Tree root) {
+	/**
+	 * This method writes all of the songs and its information into the file "Library.text". 
+	 * @param root Root of the binary tree holding each songs.
+	 */
+	public void appendToFile(Song root) {
 		
 		if(root != null) {
 			appendToFile(root.leftChild);
@@ -26,20 +38,23 @@ public class FrameListener implements WindowListener {
 		}
 	}
 	
+	/**
+	 * Event handler for when the frame is closing.
+	 */
 	public void windowClosing(WindowEvent e) {
 		
 		File myFile = new File("Library.text");
-		if(inter.action.root != null) {
+		if(gui.songTree.root != null) {
 			try {
 				print = new PrintWriter("Library.text");
 			}
 			catch (FileNotFoundException e1) {
  				e1.printStackTrace();
 			}
-			appendToFile(inter.action.root);
+			appendToFile(gui.songTree.root);
 			print.close();
 		}	
-		else if(inter.action.root == null && myFile.exists())
+		else if(gui.songTree.root == null && myFile.exists())
 			myFile.delete();
 	}
 	

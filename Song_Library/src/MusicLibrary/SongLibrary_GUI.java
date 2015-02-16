@@ -1,4 +1,8 @@
-//Truong Pham
+/**
+ * @author Truong Pham
+ * 
+ * This class creates the song library GUI.
+ */
 package MusicLibrary;
 
 import java.awt.Dimension;
@@ -21,18 +25,22 @@ import javax.swing.JTextField;
 import javax.swing.BoxLayout;
 import javax.swing.event.ListSelectionListener;
 
-public class Song_Interface {
+public class SongLibrary_GUI {
 
 	DefaultListModel<String> model;							JTextArea textArea[];
 	JButton button[]; 										JList<DefaultListModel<String>> list; 
 	JPanel panel, panel1, panel2, panel3, panel4; 			JScrollPane scroll;
 	JTextField tf[];			 							JLabel label[];
 	ActionListener buttonListener;							ListSelectionListener listListener;
-	Song_Action action;
+	SongTree songTree;
 	
-	public Song_Interface() throws IOException {
+	/**
+	 * Constructor that initializes GUI components.
+	 * @throws IOException Input output exception
+	 */
+	public SongLibrary_GUI() throws IOException {
 		
-		action = new Song_Action();
+		songTree = new SongTree();
 		buttonListener = new ButtonListener(this);
 		listListener = new ListListener(this);
 		model = new DefaultListModel<String>();
@@ -40,31 +48,34 @@ public class Song_Interface {
 			list = new JList(model);
 		else {
 			ArrayList<String> songs = new ArrayList<String>();
-			action.count = 0;
-			action.getSongs(action.root, songs);
+			songTree.order = 0;
+			songTree.getSongs(songTree.root, songs);
 			String[] songArray = new String[1];
 			songArray = songs.toArray(songArray);
-			DeFaultListModelAction modelAction = new DeFaultListModelAction();
-			modelAction.newList(model, songArray);
+			DeFaultListModel modelsongTree = new DeFaultListModel();
+			modelsongTree.newList(model, songArray);
 			list = new JList(model);
 		}
 		list.addListSelectionListener(listListener);
+		/** Create scroll panel */
 		scroll = new JScrollPane(list);
 		scroll.setMaximumSize(new Dimension (800, 300));
 		scroll.setMinimumSize(new Dimension(800, 300));
 		
+		/** Create buttons */
 		button = new JButton[5];
 		button[0] = new JButton("Add");
 		button[1] = new JButton("Delete");
 		button[2] = new JButton("Edit");
 		panel1 = new JPanel();
 		panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
-		for(int count = 0; count < 3; count++) {
-			panel1.add(button[count]);
-			button[count].addActionListener(buttonListener);
+		for(int order = 0; order < 3; order++) {
+			panel1.add(button[order]);
+			button[order].addActionListener(buttonListener);
 			panel1.add(Box.createRigidArea(new Dimension(15,0)));
 		}
 		
+		/** Create labels */
 		label = new JLabel[4];
 		label[0] = new JLabel("Song Title");
 		label[1] = new JLabel("Artist");
@@ -83,16 +94,16 @@ public class Song_Interface {
 		panel2.add(Box.createRigidArea(new Dimension(95,0)));
 		
 		tf = new JTextField[4];
-		for(int count = 0; count < 4; count++) {
-			tf[count] = new JTextField();
-			tf[count].setEditable(false);
-			tf[count].setEnabled(false);
-			tf[count].setMaximumSize(new Dimension(125,20));
+		for(int order = 0; order < 4; order++) {
+			tf[order] = new JTextField();
+			tf[order].setEditable(false);
+			tf[order].setEnabled(false);
+			tf[order].setMaximumSize(new Dimension(125,20));
 		}
 		panel3 = new JPanel();
 		panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
-		for(int count = 0; count < 4; count++) {
-			panel3.add(tf[count]);
+		for(int order = 0; order < 4; order++) {
+			panel3.add(tf[order]);
 			panel3.add(Box.createRigidArea(new Dimension(5,0)));
 		}
 	
@@ -103,24 +114,27 @@ public class Song_Interface {
 		panel4 = new JPanel();
 		panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
 		panel4.add(Box.createRigidArea(new Dimension(12,0)));
-		for(int count = 3; count < 5; count++) {
-			panel4.add(button[count]);
-			button[count].addActionListener(buttonListener);
+		for(int order = 3; order < 5; order++) {
+			panel4.add(button[order]);
+			button[order].addActionListener(buttonListener);
 			panel4.add(Box.createRigidArea(new Dimension(10,0)));
 		}
+		
+		/** Create text area */
 		textArea = new JTextArea[2];
-		for(int count = 0; count < 2; count++) {
-			textArea[count] = new JTextArea(5,65);
-			textArea[count].setEditable(false);
+		for(int order = 0; order < 2; order++) {
+			textArea[order] = new JTextArea(5,65);
+			textArea[order].setEditable(false);
 		}
 		textArea[0].setMaximumSize(new Dimension(600, 65));
 		textArea[1].setMinimumSize(new Dimension(600, 65));
 		textArea[1].setMaximumSize(new Dimension(600,65));
 		textArea[1].setMinimumSize(new Dimension(600,65));
 		
-		if(action.root != null) 
+		if(songTree.root != null) 
 			list.setSelectedIndex(0);
 		
+		/** Create panel */
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.add(scroll);
@@ -134,27 +148,33 @@ public class Song_Interface {
 		panel.add(textArea[0]);
 		panel.add(textArea[1]);
 	}
+	
+	/**
+	 * This method imports an existing library if it exists.
+	 * @return 	True if library has been imported, otherwise false.
+	 * @throws IOException Input output exception
+	 */
 	public boolean getExistingLibrary() throws IOException {
 		
 		String[] song = new String[4];
 		StringTokenizer tk; 
-		int count;
+		int order;
 		
 		File myFile = new File("Library.text");
 		if(!myFile.exists())
 			return false;
 		else {
 			Scanner sc = new Scanner(myFile);
-			for(count = 0; count < 4; count ++)
-				song[count] = null;
+			for(order = 0; order < 4; order ++)
+				song[order] = null;
 			while(sc.hasNext()) {
-				count = 0;
+				order = 0;
 				tk = new StringTokenizer(sc.nextLine(),"|");
 				while(tk.hasMoreTokens()) {
-					song[count] = tk.nextToken().trim();
-					count++;
+					song[order] = tk.nextToken().trim();
+					order++;
 				}
-				action.addToTree(song[0].trim(), song[1].trim(), song[2].trim(), song[3].trim());
+				songTree.addToTree(song[0].trim(), song[1].trim(), song[2].trim(), song[3].trim());
 			}
 			sc.close();
 		}
